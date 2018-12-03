@@ -1,0 +1,53 @@
+{
+	"variables": [],
+	"info": {
+		"name": "login",
+		"_postman_id": "dec74fe9-df11-dd86-3550-8847d4a47cb6",
+		"description": "routes for client-login-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "api.eventalent.net/login",
+			"request": {
+				"url": "api.eventalent.net/login",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					},
+					{
+						"key": "Authorization",
+						"value": "Basic aGVzdG9uOjEyMw==",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Header:\n- basic auth\n- content-type: application json"
+			},
+			"response": []
+		},
+		{
+			"name": "api.eventalent.net/register",
+			"request": {
+				"url": "api.eventalent.net/register",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"username\" : \"heston\",\n\t\"password\" : \"123\"\n}"
+				},
+				"description": "- content type: application/json\n- body: {\"username\":\"name of user\", \"password\": \"anything\"}"
+			},
+			"response": []
+		}
+	]
+}

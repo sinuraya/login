@@ -1,0 +1,507 @@
+#!/usr/bin/env php
+<?php
+
+/*
+ * This file is part of the Slim API skeleton package
+ *
+ * Copyright (c) 2016-2017 Mika Tuupola
+ *
+ * Licensed under the MIT license:
+ *   http://www.opensource.org/licenses/mit-license.php
+ *
+ * Project home:
+ *   https://github.com/tuupola/slim-api-skeleton
+ *
+ */
+
+use App\User;
+use App\Client;
+
+date_default_timezone_set("UTC");
+
+#error_reporting(E_ALL & ~E_NOTICE & ~E_WARNING);
+
+require __DIR__ . "/../vendor/autoload.php";
+require(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
+
+
+$dotenv = new Dotenv\Dotenv(__DIR__ . "/..");
+$dotenv->load();
+
+/* Setup Slim */
+$app = new Slim\App();
+
+require __DIR__ . "/../config/dependencies.php";
+$yiiConfig = require(__DIR__ . '/../config/config.php');
+new yii\web\Application($yiiConfig); // Do NOT call run() here
+
+$container = $app->getContainer();
+
+
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+
+$console = new Application();
+
+$console
+    ->register("migrate")
+    ->setDescription("Migrate database tables")
+    ->setCode(function (InputInterface $input, OutputInterface $output) use ($container) {
+        print "Create roles data... \n";
+
+        $auth = Yii::$app->authManager;
+
+        $defaultUser = $auth->getRole('default.user');
+
+        if (null === $defaultUser) {
+            $defaultUser = $auth->createRole('default.user');
+            $auth->add($defaultUser);
+        }
+        
+        // add "default.list" permission
+        $defaultList = $auth->getPermission('default.list');
+        if (null === $defaultList) {
+            $defaultList = $auth->createPermission('default.list');
+            $defaultList->description = 'Default List';
+            $auth->add($defaultList);
+            $auth->addChild($defaultUser, $defaultList);
+            print "Adding default.list ...\n";
+        }
+
+        // add "default.view" permission
+        $defaultView = $auth->getPermission('default.view');
+        if (null === $defaultView) {
+            $defaultView = $auth->createPermission('default.view');
+            $defaultView->description = 'Default View';
+            $auth->add($defaultView);
+            $auth->addChild($defaultUser, $defaultView);
+            print "Adding default.view ...\n";
+        }
+
+        // add "default.read" permission
+        $defaultRead = $auth->getPermission('default.read');
+        if (null === $defaultRead) {
+            $defaultRead = $auth->createPermission('default.read');
+            $defaultRead->description = 'Default Read';
+            $auth->add($defaultRead);
+            $auth->addChild($defaultUser, $defaultRead);
+            print "Adding default.read ...\n";
+        }
+
+
+        // add "default.add" permission
+        $defaultAdd = $auth->getPermission('default.add'); 
+        if (null === $defaultAdd) {
+            $defaultAdd = $auth->createPermission('default.add');
+            $defaultAdd->description = 'Default Add';
+            $auth->add($defaultAdd);
+            $auth->addChild($defaultUser, $defaultAdd);
+            print "Adding default.add ...\n";
+        }
+
+        // add "default.update" permission
+        $defaultUpdate = $auth->getPermission('default.update');
+        if (null === $defaultUpdate) {
+            $defaultUpdate = $auth->createPermission('default.update');
+            $defaultUpdate->description = 'Default Update';
+            $auth->add($defaultUpdate);
+            $auth->addChild($defaultUser, $defaultUpdate);
+            print "Adding default.update ...\n";
+        }
+
+        // add "default.delete" permission
+        $defaultDelete = $auth->getPermission('default.delete');
+        if (null === $defaultDelete) {
+            $defaultDelete = $auth->createPermission('default.delete');
+            $defaultDelete->description = 'Default Delete';
+            $auth->add($defaultDelete);
+            $auth->addChild($defaultUser, $defaultDelete);
+            print "Adding default.delete ...\n";
+        }
+
+        // talent permission
+        // add "talent.list" permission
+        $talentList = $auth->getPermission('talent.list');
+        if (null === $talentList) {
+            $talentList = $auth->createPermission('talent.list');
+            $talentList->description = 'Talent List';
+            $auth->add($talentList);
+            $auth->addChild($defaultUser, $talentList);
+            print "Adding talent.list ...\n";
+        }
+
+        // add "talent.read" permission
+        $talentView = $auth->getPermission('talent.read');
+        if (null === $talentView) {
+            $talentView = $auth->createPermission('talent.read');
+            $talentView->description = 'Talent View';
+            $auth->add($talentView);
+            $auth->addChild($defaultUser, $talentView);
+            print "Adding talent.read ...\n";
+        }
+
+        // add "talent.add" permission
+        $talentAdd = $auth->getPermission('talent.create');
+        if (null === $talentAdd) {
+            $talentAdd = $auth->createPermission('talent.create');
+            $talentAdd->description = 'Talent Add';
+            $auth->add($talentAdd);
+            $auth->addChild($defaultUser, $talentAdd);
+            print "Adding talent.create ...\n";
+        }
+
+        // add "talent.update" permission
+        $talentUpdate = $auth->getPermission('talent.update');
+        if (null === $talentUpdate) {
+            $talentUpdate = $auth->createPermission('talent.update');
+            $talentUpdate->description = 'Talent Update';
+            $auth->add($talentUpdate);
+            $auth->addChild($defaultUser, $talentUpdate);
+            print "Adding talent.update ...\n";
+        }
+
+        // add "talent.delete" permission
+        $talentDelete = $auth->getPermission("talent.delete");
+        if (null === $talentDelete) {
+            $talentDelete = $auth->createPermission('talent.delete');
+            $talentDelete->description = 'Talent Delete';
+            $auth->add($talentDelete);
+            $auth->addChild($defaultUser, $talentDelete);
+            print "Adding talent.delete ...\n";
+        }
+
+        // media permissions
+        // add "media.list" permission
+        $mediaList = $auth->getPermission('media.list');
+        if (null === $mediaList) {
+            $mediaList = $auth->createPermission('media.list');
+            $mediaList->description = 'Media List';
+            $auth->add($mediaList);
+            $auth->addChild($defaultUser, $mediaList);
+            print "Adding media.list ...\n";
+        }
+
+        // add "media.read" permission
+        $mediaView = $auth->getPermission('media.read');
+        if (null === $mediaView) {
+            $mediaView = $auth->createPermission('media.read');
+            $mediaView->description = 'Media View';
+            $auth->add($mediaView);
+            $auth->addChild($defaultUser, $mediaView);
+            print "Adding media.read ...\n";
+        }
+
+        // add "media.add" permission
+        $mediaAdd = $auth->getPermission('media.create');
+        if (null === $mediaAdd) {
+            $mediaAdd = $auth->createPermission('media.create');
+            $mediaAdd->description = 'Media Add';
+            $auth->add($mediaAdd);
+            $auth->addChild($defaultUser, $mediaAdd);
+            print "Adding media.create ...\n";
+        }
+
+        // add "media.update" permission
+        $mediaUpdate = $auth->getPermission('media.update');
+        if (null === $mediaUpdate) {
+            $mediaUpdate = $auth->createPermission('media.update');
+            $mediaUpdate->description = 'Media Update';
+            $auth->add($mediaUpdate);
+            $auth->addChild($defaultUser, $mediaUpdate);
+            print "Adding media.update ...\n";
+        }
+
+        // inbox permissions
+        // add "inbox.list" permission
+        $inboxList = $auth->getPermission('inbox.list');
+        if (null === $inboxList) {
+            $inboxList = $auth->createPermission('inbox.list');
+            $inboxList->description = 'Inbox List';
+            $auth->add($inboxList);
+            $auth->addChild($defaultUser, $inboxList);
+            print "Adding inbox.list ...\n";
+        }
+
+        // add "inbox.read" permission
+        $inboxView = $auth->getPermission('inbox.read');
+        if (null === $inboxView) {
+            $inboxView = $auth->createPermission('inbox.read');
+            $inboxView->description = 'Inbox View';
+            $auth->add($inboxView);
+            $auth->addChild($defaultUser, $inboxView);
+            print "Adding inbox.read ...\n";
+        }
+
+        // add "inbox.add" permission
+        $inboxAdd = $auth->getPermission('inbox.create');
+        if (null === $inboxAdd) {
+            $inboxAdd = $auth->createPermission('inbox.create');
+            $inboxAdd->description = 'Inbox Add';
+            $auth->add($inboxAdd);
+            $auth->addChild($defaultUser, $inboxAdd);
+            print "Adding inbox.create ...\n";
+        }
+
+        // add "talent.update" permission
+        $inboxUpdate = $auth->getPermission('inbox.update');
+        if (null === $inboxUpdate) {
+            $inboxUpdate = $auth->createPermission('inbox.update');
+            $inboxUpdate->description = 'Inbox Update';
+            $auth->add($inboxUpdate);
+            $auth->addChild($defaultUser, $inboxUpdate);
+            print "Adding inbox.update ...\n";
+        }
+
+        // add "inbox.delete" permission
+        $inboxDelete = $auth->getPermission("inbox.delete");
+        if (null === $inboxDelete) {
+            $inboxDelete = $auth->createPermission('inbox.delete');
+            $inboxDelete->description = 'Inbox Delete';
+            $auth->add($inboxDelete);
+            $auth->addChild($defaultUser, $inboxDelete);
+            print "Adding inbox.delete ...\n";
+        }
+
+        // calendar permissions
+        // add "calendar.list" permission
+        $calendarList = $auth->getPermission('calendar.list');
+        if (null === $calendarList) {
+            $calendarList = $auth->createPermission('calendar.list');
+            $calendarList->description = 'Calendar  List';
+            $auth->add($calendarList);
+            $auth->addChild($defaultUser, $calendarList);
+            print "Adding calendar.list ...\n";
+        }
+
+        // add "calendar.read" permission
+        $calendarView = $auth->getPermission('calendar.read');
+        if (null === $calendarView) {
+            $calendarView = $auth->createPermission('calendar.read');
+            $calendarView->description = 'Calendar View';
+            $auth->add($calendarView);
+            $auth->addChild($defaultUser, $calendarView);
+            print "Adding calendar.read ...\n";
+        }
+
+        // add "calendar.add" permission
+        $calendarAdd = $auth->getPermission('calendar.create');
+        if (null === $calendarAdd) {
+            $calendarAdd = $auth->createPermission('calendar.create');
+            $calendarAdd->description = 'Calendar Add';
+            $auth->add($calendarAdd);
+            $auth->addChild($defaultUser, $calendarAdd);
+            print "Adding calendar.create ...\n";
+        }
+
+        // add "calendar.update" permission
+        $calendarUpdate = $auth->getPermission('calendar.update');
+        if (null === $calendarUpdate) {
+            $calendarUpdate = $auth->createPermission('calendar.update');
+            $calendarUpdate->description = 'Calendar Update';
+            $auth->add($calendarUpdate);
+            $auth->addChild($defaultUser, $calendarUpdate);
+            print "Adding calendar.update ...\n";
+        }
+
+        // add "calendar.delete" permission
+        $calendarDelete = $auth->getPermission("calendar.delete");
+        if (null === $calendarDelete) {
+            $calendarDelete = $auth->createPermission('calendar.delete');
+            $calendarDelete->description = 'Calendar Delete';
+            $auth->add($calendarDelete);
+            $auth->addChild($defaultUser, $calendarDelete);
+            print "Adding calendar.delete ...\n";
+        }
+
+        // talent-account permission
+        // add "talent-account.list" permission
+        $talentAccountList = $auth->getPermission('talent-account.list');
+        if (null === $talentAccountList) {
+            $talentAccountList = $auth->createPermission('talent-account.list');
+            $talentAccountList->description = 'Talent Account List';
+            $auth->add($talentAccountList);
+            $auth->addChild($defaultUser, $talentAccountList);
+            print "Adding talent-account.list ...\n";
+        }
+
+        // add "talent-account.read" permission
+        $talentAccountView = $auth->getPermission('talent-account.read');
+        if (null === $talentAccountView) {
+            $talentAccountView = $auth->createPermission('talent-account.read');
+            $talentAccountView->description = 'Talent Account View';
+            $auth->add($talentAccountView);
+            $auth->addChild($defaultUser, $talentAccountView);
+            print "Adding talent-account.read ...\n";
+        }
+
+        // add "talent-account.view" permission
+
+        // if (null === $auth->getPermission('talent-account.view')) {
+        //     $talentAccountView = $auth->createPermission('talent-account.view');
+        //     $talentAccountView->description = 'Talent Account View';
+        //     $auth->add($talentAccountView);
+        //     $auth->addChild($defaultUser, $talentAccountView);
+        //     print "Adding talent-account.view ...\n";
+        // }
+
+        // add "talent-account.create" permission
+        $talentAccountAdd = $auth->getPermission('talent-account.create');
+        if (null === $talentAccountAdd) {
+            $talentAccountAdd = $auth->createPermission('talent-account.create');
+            $talentAccountAdd->description = 'Talent Account Add';
+            $auth->add($talentAccountAdd);
+            $auth->addChild($defaultUser, $talentAccountAdd);
+            print "Adding talent-account.create ...\n";
+        }
+
+        // add "talent-account.update" permission
+        $talentAccountUpdate = $auth->getPermission('talent-account.update');
+        if (null === $talentAccountUpdate) {
+            $talentAccountUpdate = $auth->createPermission('talent-account.update');
+            $talentAccountUpdate->description = 'Talent Account Update';
+            $auth->add($talentAccountUpdate);
+            $auth->addChild($defaultUser, $talentAccountUpdate);
+            print "Adding talent-account.update ...\n";
+        }
+
+        // add "talent-account.delete" permission
+        $talentAccountDelete = $auth->getPermission("talent-account.delete");
+        if (null === $talentAccountDelete) {
+            $talentAccountDelete = $auth->createPermission('talent-account.delete');
+            $talentAccountDelete->description = 'Talent Account Delete';
+            $auth->add($talentAccountDelete);
+            $auth->addChild($defaultUser, $talentAccountDelete);
+            print "Adding talent-account.delete ...\n";
+        }
+
+
+        // category permissions
+        // add "category.list" permission
+        // if (null === $auth->getPermission('category.list')) {
+        //     $categoryList = $auth->createPermission('category.list');
+        //     $categoryList->description = 'Category  List';
+        //     $auth->add($categoryList);
+        //     $auth->addChild($defaultUser, $categoryList);
+        //     print "Adding category.list ...\n";
+        // }
+
+        // add "category.read" permission
+        $categoryView = $auth->getPermission('category.read');
+        if (null === $categoryView) {
+            $categoryView = $auth->createPermission('category.read');
+            $categoryView->description = 'Category View';
+            $auth->add($categoryView);
+            $auth->addChild($defaultUser, $categoryView);
+            print "Adding category.read ...\n";
+        }
+
+        // add "category.add" permission
+        // if (null === $auth->getPermission('category.create')) {
+        //     $categoryAdd = $auth->createPermission('category.create');
+        //     $categoryAdd->description = 'Category Add';
+        //     $auth->add($categoryAdd);
+        //     $auth->addChild($defaultUser, $categoryAdd);
+        //     print "Adding category.create ...\n";
+        // }
+
+        // // add "category.update" permission
+        // if (null === $auth->getPermission('category.update')) {
+        //     $categoryUpdate = $auth->createPermission('category.update');
+        //     $categoryUpdate->description = 'Category Update';
+        //     $auth->add($categoryUpdate);
+        //     $auth->addChild($defaultUser, $categoryUpdate);
+        //     print "Adding category.update ...\n";
+        // }
+
+        // // add "category.delete" permission
+        // if (null === $auth->getPermission("category.delete")) {
+        //     $categoryDelete = $auth->createPermission('category.delete');
+        //     $categoryDelete->description = 'Category Delete';
+        //     $auth->add($categoryDelete);
+        //     $auth->addChild($defaultUser, $categoryDelete);
+        //     print "Adding category.delete ...\n";
+        // }
+
+        // events permissions
+        // add "event.list" permission
+        $eventList = $auth->getPermission('event.list');
+        if (null === $eventList) {
+            $eventList = $auth->createPermission('event.list');
+            $eventList->description = 'Events  List';
+            $auth->add($eventList);
+            $auth->addChild($defaultUser, $eventList);
+            print "Adding event.list ...\n";
+        }
+
+        // add "event.read" permission
+        $eventView = $auth->getPermission('event.list');
+        if (null === $eventView) {
+            $eventView = $auth->createPermission('event.read');
+            $eventView->description = 'Event View';
+            $auth->add($eventView);
+            $auth->addChild($defaultUser, $eventView);
+            print "Adding event.read ...\n";
+        }
+
+        // add "event.add" permission
+        $eventAdd = $auth->getPermission('event.create');
+        if (null === $eventAdd) {
+            $eventAdd = $auth->createPermission('event.create');
+            $eventAdd->description = 'Event Add';
+            $auth->add($eventAdd);
+            $auth->addChild($defaultUser, $eventAdd);
+            print "Adding event.create ...\n";
+        }
+
+        // add "event.update" permission
+        $eventUpdate = $auth->getPermission('event.update');
+        if (null === $eventUpdate) {
+            $eventUpdate = $auth->createPermission('event.update');
+            $eventUpdate->description = 'Event Update';
+            $auth->add($eventUpdate);
+            $auth->addChild($defaultUser, $eventUpdate);
+            print "Adding event.update ...\n";
+        }
+
+        // add "event.delete" permission
+        $eventDelete = $auth->getPermission("event.delete");
+        if (null === $eventDelete) {
+            $eventDelete = $auth->createPermission('event.delete');
+            $eventDelete->description = 'Event Delete';
+            $auth->add($eventDelete);
+            $auth->addChild($defaultUser, $eventDelete);
+            print "Adding event.delete ...\n";
+        }
+
+        $bannedUser = $auth->getRole('banned.user');
+        
+        if (null === $bannedUser) {
+            $bannedUser = $auth->createRole('banned.user');
+            $auth->add($bannedUser);
+            $auth->addChild($bannedUser, $mediaList);
+            $auth->addChild($bannedUser, $mediaView);
+            $auth->addChild($bannedUser, $mediaAdd);
+            $auth->addChild($bannedUser, $mediaUpdate);
+            $auth->addChild($bannedUser, $inboxList);
+            $auth->addChild($bannedUser, $inboxView);
+            $auth->addChild($bannedUser, $talentView);
+        }
+
+        $unactiveUser = $auth->getRole('non-active.user');
+        
+        if (null === $unactiveUser) {
+            $unactiveUser = $auth->createRole('non-active.user');
+            $auth->add($unactiveUser);
+            $auth->addChild($unactiveUser, $inboxList);
+            $auth->addChild($unactiveUser, $inboxView);
+            $auth->addChild($unactiveUser, $talentView);
+        }
+        
+
+    })
+;
+
+$console->run();

@@ -1,0 +1,6 @@
+.env
+vendor/
+logs/
+support/
+.vagrant/
+.vscode/
